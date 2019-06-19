@@ -83,7 +83,8 @@ end
 % Cov_std_unfolded = [Cov_std;flip(Cov_std(2:(end-1)))];
 % Lags_unfolded = [Lags;flip(Lags(2:(end-1)))];
 
-if nargout == 2
+if nargout == 1
+elseif nargout == 2
     varargout{1} = Lags;
 elseif nargout == 3
     varargout{1} = Lags;
