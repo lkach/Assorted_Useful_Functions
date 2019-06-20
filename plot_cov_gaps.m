@@ -19,7 +19,7 @@ function [C_xx, C_yy, C_xy] = plot_cov_gaps(x,y,varargin)
 
 
 if nargin == 2
-    [C_xx, Lags_xx] = cov_gaps(x,x);
+    [C_xx, Lags_xx, ~, n_Cov] = cov_gaps(x,x);
     C_yy = cov_gaps(y,y);
     C_xy = cov_gaps(x,y);
     Lags_yy = Lags_xx;
@@ -47,5 +47,16 @@ plot(Lags_xy,C_xy,'.:')
 legend('C_x_x','C_y_y','C_x_y')
 xlabel('Lags')
 ylabel('Covariance')
+title('Untapered Covariance')
+
+% % With 
+% figure
+% plot(Lags_xx,C_xx.*(n_Cov(:,1)/n_Cov(1,1)).^0.5,'.:');hold on
+% plot(Lags_yy,C_yy.*(n_Cov(:,1)/n_Cov(1,1)).^0.5,'.:')
+% plot(Lags_xy,C_xy.*(n_Cov(:,1)/n_Cov(1,1)).^0.5,'.:')
+% legend('C_x_x','C_y_y','C_x_y')
+% xlabel('Lags')
+% ylabel('Covariance')
+% title('Covariance tapered by 1/sqrt(N)')
 
 end
