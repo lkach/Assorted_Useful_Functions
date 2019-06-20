@@ -49,7 +49,7 @@ xlabel('Lags')
 ylabel('Covariance')
 title('Untapered Covariance')
 
-% % With 
+% % Tapered at large lags to depress spurious correlation:
 % figure
 % plot(Lags_xx,C_xx.*(n_Cov(:,1)/n_Cov(1,1)).^0.5,'.:');hold on
 % plot(Lags_yy,C_yy.*(n_Cov(:,1)/n_Cov(1,1)).^0.5,'.:')
