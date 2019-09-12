@@ -111,7 +111,7 @@ if iscell(PDF_x{1})
         PDF_x_discreten = eval([pdf_xn,';']);
         
         % Normalize:
-        PDF_x_discreten = round(B*N*PDF_x_discreten/(sum(PDF_x_discreten)));
+        PDF_x_discreten = round(B*N*PDF_x_discreten/(nansum(PDF_x_discreten)));
         
         % Build population of x's (X) that will match the PDF:
         Xn = [];
@@ -186,7 +186,7 @@ else
     PDF_x_discrete = eval(pdf_x);
     
     % Normalize:
-    PDF_x_discrete = round(B*N*PDF_x_discrete/(sum(PDF_x_discrete)));
+    PDF_x_discrete = round(B*N*PDF_x_discrete/(nansum(PDF_x_discrete)));
     
     % Build population of x's (X) that will match the PDF:
     X = [];
