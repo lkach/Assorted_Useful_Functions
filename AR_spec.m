@@ -1,4 +1,4 @@
-% [S, f, C, tau] = AR_Spec(AR_coef,dt,T)
+% [S, f, C, tau] = AR_spec(AR_coef,dt,T)
 % 
 % Spectrum of an AR process:
 % 
@@ -18,7 +18,7 @@
 % 
 % Outputs after "S" are optional.
 
-function varargout = AR_Spec(AR_coef,dt,T)
+function varargout = AR_spec(AR_coef,dt,T)
 
 if isrow(AR_coef)
 elseif iscolumn(AR_coef)
@@ -72,7 +72,7 @@ end
 % ARC = [.8,-.2];
 % foo = randn_ar(1000,ARC); foo = foo/std(foo);
 % figure;plot(foo)
-% [S,f,C,tau] = AR_Spec(ARC,1,length(foo));
+% [S,f,C,tau] = AR_spec(ARC,1,length(foo));
 % figure;semilogy(f,S,'.-')
 % figure;plot(real(C),'.-');hold on;plot(imag(C))
 %        plot(flip(fftshift(xcorr(foo,'coeff'))),'.-r')
