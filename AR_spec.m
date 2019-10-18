@@ -38,6 +38,15 @@ F = repmat(f,1,p);
 
 S = 1./abs(1 - sum(exp(-2*pi*1i*F.*[1:p]).*AR_coef,2)).^2;
 
+% I have found that I need to multiply this by 2 to make it agree with the
+% power spectrum calculated by other means (e.g. "Welch's method", SIO's
+% go-to). This is probably because this (above) is the theoretical power
+% spectrum, whereas the one that we get is double of half the fft (so we
+% always take half the fft and double it to preserve variance in practive
+% due to the ft's symmetry for real data). Because we're looking at half of
+% the "possible" frequencies, we should double this S:
+S = 2*S;
+
 if nargout == 1
     varargout{1} = S;
 elseif nargout == 2
