@@ -76,17 +76,6 @@ N_nonan = sum(isfinite(D));
             end
             r0 = nanmean(D.*D)/varD;
 
-            % % % Alternative that might help with trouble-shooting:
-            % foo = nansum(D.^2); % for agreement
-            % % Now define the vector r, which is p+1 elements long:
-            % r = nan(p,1);
-            % for i = 2:(p+1)
-            %     xx_lag = D(i:end).*D(1:(end - i + 1));
-            %     r(i-1) = nansum(xx_lag)/foo;
-            % end
-            % r0 = nansum(D.*D)/foo;
-
-
 % Error message for if r(1) ~= 1
 if r0 == 1
 else
@@ -98,15 +87,9 @@ end
 R = zeros(p,p);
 rr = [flip(r(1:(end-1))); r0; r(1:(end-1))];
                          % Backwards r (except r(1)) appended to r, used to
-                         % build R. Note that I shaved off the less element
+                         % build R. Note that I shaved off the last element
                          % in r because it's not used in building R.
-% size(R)
-% size(r)
-% size(rr)
-% size(ones(2*p-1,1).*rr')
-% % % % R = spdiags(ones(2*p-1,1).*rr',-(p-1):(p-1),R) + R;
-% % % % FATAL FLAW ON OLD MATLAB VERSIONS % % % %
-% % % % for this server version, the two lines below replace the line above (i.e. 107):
+
 rr_columns = (rr*rr'*ones(2*p-1))'/sum(rr);
 R = spdiags(rr_columns,-(p-1):(p-1),R) + R;
                       % adding the R at the end while it's still all zeros
@@ -114,7 +97,6 @@ R = spdiags(rr_columns,-(p-1):(p-1),R) + R;
                       % memory intensive for non-sparse matrices like this
                       % (I really just wish that "diag" had the same
                       % functionality that "spdiags" does.
-%
 
 Phi = R\r; % alternatively (but maybe more slowly) "Phi = inv(R)*r;"
 
