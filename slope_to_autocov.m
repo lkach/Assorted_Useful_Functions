@@ -20,6 +20,13 @@ Lags = [0:(length(AutoCov)-1)]';
 AutoCov = AutoCov(1:Length);
 Lags = Lags(1:Length);
 
+% Adjust so that sum(AutoCov) = 1 (approximately)
+if Slope > 0
+    AutoCov = AutoCov*(2^(Slope + 1))*(Slope + 1);
+elseif Slope < 0
+    AutoCov = AutoCov*(2^(Slope + 1))*(Length^Slope);
+end
+
 % figure;plot(Lags,AutoCov,'.-');hold on;plot(Lags(1:Length),AutoCov(1:Length),'o--')
 
 end
