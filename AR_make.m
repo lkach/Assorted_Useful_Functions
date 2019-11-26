@@ -32,4 +32,7 @@ end
 
 Out = Out((p+1):end);
 
+Out = Out/std(Out);
+Out = Out - mean(Out);
+
 end
