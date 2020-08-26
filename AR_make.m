@@ -9,7 +9,8 @@
 %             AR coefficients phi.
 % IN:   Init = (Optional) Initialization time series of length p from which
 %             "OUT" will be constructed based on "phi". Default is white
-%             noise of variance 1.
+%             noise of variance 1. Note that "Init" will be de-meaned and
+%             have its variance normalized to 1;
 % 
 % OUT:  Out = length N AR(p) process with AR coefficients phi. This will
 %             have a variance of 1 and mean of 0.
@@ -22,6 +23,8 @@ if nargin == 3
     Init = varargin{1};
     if isrow(Init); Init = Init'; else; end
     if length(Init) ~= p; error('"Init" must have the same length as "phi".'); else; end
+    Init = Init - mean(Init);
+    Init = Init/std(Init);
 elseif nargin == 2
     Init = randn(p, 1);
 else
