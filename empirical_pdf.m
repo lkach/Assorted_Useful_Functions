@@ -1,5 +1,5 @@
-% Y_pop = empirical_pdf(PDF_x, B_N, y, lims);
-% Y_pop = empirical_pdf(PDF_x, B_N, y,);
+% [Y_pop, X_1, X_2, ...] = empirical_pdf(PDF_x, B_N, y, lims);
+% [Y_pop, X_1, X_2, ...] = empirical_pdf(PDF_x, B_N, y,);
 % 
 % Empirical PDF of y = y(x), where x is a value with a known or assumed
 % PDF.
@@ -62,6 +62,14 @@
 %         This variable is deterministic for y(x), but will necessarily
 %         have some randomness for y(x1,x2,...).
 % 
+% X_n =   (Optional) Vector(s) of the populations of random variables from
+%         which Y is derived.
+% 
+% 
+%                                   EXAMPLE SYNTAX:
+% 
+% PDF_x = {{'exp(-(x1-m1).^2 / (2*s1^2))', 'm1=2', 's1=1'}, {'exp(-(x2-m2).^2 / (2*s2^2))', 'm2=-5', 's2=2'}}
+% [Y_pop, X_1, X_2] = empirical_pdf(PDF_x, [100, 1000], 'x1.^2 + x2.^2', {2+3*[-1 1],-5+3*[-2 2]});
 
 function varargout = empirical_pdf(PDF_x, B_N, y, varargin)
 
@@ -75,10 +83,8 @@ if iscell(PDF_x{1})
     % practices for the sake of convenience (heavy use of the "eval"
     % function). If this breaks your computer, you did something wrong
     % because it definitely shouldn't be that bad.
-    if iscell(PDF_x{1})
-    else
-        error('Incorrectly formatted input "PDF_x".')
-    end
+    
+    NVars = 'multivariable';
     
     if nargin ~= 4
         error('Input variable "lims" is required for multivariable PDF''s.')
@@ -129,7 +135,7 @@ if iscell(PDF_x{1})
                 Xn = [Xn, (xn(end) - dxn/2):(dxn/PDF_x_discreten(end)):(xn(end))];
             elseif (dxn/PDF_x_discreten(end)) > dxn/2 % i.e. if there are approximately zero samples in this range
             end
-        Xn = Xn - dxn/2;
+        Xn = Xn' - dxn/2;
         
         % This part is confusing, because we are overwriting "x" with the data in
         % "X" so that the input "y" makes sense (I didn't want to force the user to
@@ -140,7 +146,7 @@ if iscell(PDF_x{1})
     
     % We should now have x1, x2, x3, etc., which will have almost the same
     % length, but there were rounding errors. Therefore, we need to
-    % randomly remove elements from all bu the shortest x_n until they all
+    % randomly remove elements from all but the shortest x_n until they all
     % have the same length as the shortest one (necessary in calculating
     % y).
     
@@ -162,6 +168,7 @@ if iscell(PDF_x{1})
     % y is defined after the if-statement
     %%
 else
+    NVars = 'single variable';
     if length(PDF_x) > 1
         pdf_x = PDF_x{1};
         for ii = 2:(length(PDF_x))
@@ -215,7 +222,7 @@ else
             X = [X, (x(end) - dx/2):(dx/PDF_x_discrete(end)):(x(end))];
         elseif (dx/PDF_x_discrete(end)) > dx/2 % i.e. if there are approximately zero samples in this range
         end
-    Xn = Xn - dx/2;
+    X = X' - dx/2;
     
     % This part is confusing, because we are overwriting "x" with the data in
     % "X" so that the input "y" makes sense (I didn't want to force the user to
@@ -229,15 +236,45 @@ end
 eval(['Y_pop = ',y,';'])
 % figure;histogram(Y_pop,'Normalization','pdf');title('histogram of y')
 
-% Possibly unnecessary, otherwise switch "varargout" at beginning of function with "PDF_y":
-if nargout == 1
+if nargout > 1
     varargout{1} = Y_pop;
-elseif nargout == 0
-    disp(Y_pop)
+    if strcmp(NVars,'multivariable') % multivariable (x1, x2, ...)
+        for n=1:length(PDF_x)
+            varargout{1+n} = eval(['x',num2str(n),';']);
+        end
+    elseif strcmp(NVars,'single variable') % single variable (x only)
+        varargout{2} = x;
+    else
+    end
+elseif nargout == 1
+    varargout{1} = Y_pop;
 else
-    error('Wrong number of outputs (should be zero or one).')
+    disp(Y_pop)
+end
+
+if strcmp(NVars,'multivariable') && nargout > (1+length(PDF_x))
+    warning('The number of requested outputs is too large.')
+elseif strcmp(NVars,'single variable') && nargout > 2
+    warning('The number of requested outputs is too large.')
+else
 end
 
 end
-% % EXAMPLE:
+% % EXAMPLE 1:
 % Y_pop = empirical_pdf({{'g','m1 = 10','s1 = 5'},{'g','m2 = 10','s2 = 5'}}, [1000,20], 'atan2(x1,x2)', {10+[-15 15],10+[-15 15]});
+
+% % EXAMPLE 2:
+% 
+% % Monte Carlo to compare:
+% X1 = 1*randn(10000,1) + 2;
+% X2 = 2*randn(10000,1) + (-5);
+% Y = (X1.^2 + X2.^2);
+% 
+% % This method:
+% PDF_x = {{'exp(-(x1-m1).^2 / (2*s1^2))', 'm1=2', 's1=1'}, {'exp(-(x2-m2).^2 / (2*s2^2))', 'm2=-5', 's2=2'}};
+% [Y_pop, X_1, X_2] = empirical_pdf(PDF_x, [100, 1000], 'x1.^2 + x2.^2', {2+3*[-1 1],-5+3*[-2 2]});
+% 
+% % Plot:
+% figure;histogram(Y,'normalization','pdf');hold on;histogram(Y_pop,'normalization','pdf')
+% figure;histogram(X1,'normalization','pdf');hold on;histogram(X_1,'normalization','pdf');
+% figure;histogram(X2,'normalization','pdf');hold on;histogram(X_2,'normalization','pdf');
