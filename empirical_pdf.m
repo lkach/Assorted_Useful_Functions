@@ -92,7 +92,6 @@ if iscell(PDF_x{1})
     %%
     % Loop through all the variables (1:length(PDF_x)), heavily relying on
     % the "eval" function:
-    
     for n = 1:length(PDF_x)
         
         pdf_xn = PDF_x{n}{1};
@@ -112,14 +111,25 @@ if iscell(PDF_x{1})
         
         % Normalize:
         PDF_x_discreten = round(B*N*PDF_x_discreten/(nansum(PDF_x_discreten)));
+        % foo = dxn./PDF_x_discreten; foo(~isfinite(foo)) = -1; figure;plot(foo,'.-')%$
         
         % Build population of x's (X) that will match the PDF:
         Xn = [];
-        Xn = [Xn, (xn(1)):(dxn/PDF_x_discreten(1)):(xn(1) + dxn/2)];
+            if (dxn/PDF_x_discreten(1)) <= dxn/2 % i.e. if there are not approximately zero samples in this range
+                Xn = [Xn, (xn(1)):(dxn/PDF_x_discreten(1)):(xn(1) + dxn/2)];
+            elseif (dxn/PDF_x_discreten(1)) > dxn/2 % i.e. if there are approximately zero samples in this range
+            end
         for jj = 2:(length(PDF_x_discreten) - 1)
-            Xn = [Xn, (xn(jj)):(dxn/PDF_x_discreten(jj)):(xn(jj) + dxn)];
+            if dxn/PDF_x_discreten(jj) <= dxn % i.e. if there are not approximately zero samples in this range
+                Xn = [Xn, (xn(jj)):(dxn/PDF_x_discreten(jj)):(xn(jj) + dxn)];
+            elseif dxn/PDF_x_discreten(jj) > dxn % i.e. if there are approximately zero samples in this range
+            end
         end
-        Xn = [Xn, (xn(end) - dxn/2):(dxn/PDF_x_discreten(end)):(xn(end))];
+            if (dxn/PDF_x_discreten(end)) <= dxn/2 % i.e. if there are not approximately zero samples in this range
+                Xn = [Xn, (xn(end) - dxn/2):(dxn/PDF_x_discreten(end)):(xn(end))];
+            elseif (dxn/PDF_x_discreten(end)) > dxn/2 % i.e. if there are approximately zero samples in this range
+            end
+        Xn = Xn - dxn/2;
         
         % This part is confusing, because we are overwriting "x" with the data in
         % "X" so that the input "y" makes sense (I didn't want to force the user to
@@ -190,17 +200,28 @@ else
     
     % Build population of x's (X) that will match the PDF:
     X = [];
-    X = [X, (x(1)):(dx/PDF_x_discrete(1)):(x(1) + dx/2)];
+        if (dx/PDF_x_discrete(1)) <= dx/2 % i.e. if there are not approximately zero samples in this range
+            X = [X, (x(1)):(dx/PDF_x_discrete(1)):(x(1) + dx/2)];
+        elseif (dx/PDF_x_discrete(1)) > dx/2 % i.e. if there are approximately zero samples in this range
+        end
     for jj = 2:(length(PDF_x_discrete) - 1)
-        X = [X, (x(jj)):(dx/PDF_x_discrete(jj)):(x(jj) + dx)];
+        % X = [X, (x(jj)):(dx/PDF_x_discrete(jj)):(x(jj) + dx)];
+        if (dx/PDF_x_discrete(jj)) <= dx % i.e. if there are not approximately zero samples in this range
+            X = [X, (x(jj)):(dx/PDF_x_discrete(jj)):(x(jj) + dx)];
+        elseif (dx/PDF_x_discrete(jj)) > dx % i.e. if there are approximately zero samples in this range
+        end
     end
-    X = [X, (x(end) - dx/2):(dx/PDF_x_discrete(end)):(x(end))];
+        if (dx/PDF_x_discrete(end)) <= dx/2 % i.e. if there are not approximately zero samples in this range
+            X = [X, (x(end) - dx/2):(dx/PDF_x_discrete(end)):(x(end))];
+        elseif (dx/PDF_x_discrete(end)) > dx/2 % i.e. if there are approximately zero samples in this range
+        end
+    Xn = Xn - dx/2;
     
     % This part is confusing, because we are overwriting "x" with the data in
     % "X" so that the input "y" makes sense (I didn't want to force the user to
     % distinguish between the variable x and population X):
     x = X;
-    % figure;histogram(x,'Normalization','pdf');title('histogram of x')
+    % figure;histogram(x,'Normalization','pdf');title('histogram of x')%$
 end
 
 %%
@@ -218,6 +239,5 @@ else
 end
 
 end
-
 % % EXAMPLE:
 % Y_pop = empirical_pdf({{'g','m1 = 10','s1 = 5'},{'g','m2 = 10','s2 = 5'}}, [1000,20], 'atan2(x1,x2)', {10+[-15 15],10+[-15 15]});
