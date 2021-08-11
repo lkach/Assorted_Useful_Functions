@@ -138,20 +138,14 @@ cov_std_xy = zeros(1 + 2*maxlag,1); % the std of the points that went into each 
 n_cov_xy = zeros(1 + 2*maxlag,2); % how many pairs were finite and how many pairs could have been finite if perfect
 % There is certainly a way to code this to go in one loop, but this works:
 for i=1:(1 + maxlag) % lag = (i-1)*dt
-    cov_xy_i = zeros(N_x - i + 1,1);
-    for j=1:(N_x - i + 1)
-        cov_xy_i(j) = Y(j)*X(j+i-1);
-    end
+    cov_xy_i = X(i:end).*Y(1:(end-i+1)); % length N_x - i + 1 (I think)
     cov_xy(i+maxlag) = nanmean(cov_xy_i); % autocov
     cov_std_xy(i+maxlag) = nanstd(cov_xy_i); % std of points that made each element of autocov
     n_cov_xy(i+maxlag,1) = sum(isfinite(cov_xy_i)); % how many pairs were finite
     n_cov_xy(i+maxlag,2) = N_x - i + 1; % how many pairs could have been finite if perfect
 end
 for i=2:(1 + maxlag) % lag = -(i-1)*dt
-    cov_xy_i = zeros(N_x - i + 1,1);
-    for j=1:(N_x - i + 1)
-        cov_xy_i(j) = X(j)*Y(j+i-1);
-    end
+    cov_xy_i = X(1:(end-i+1)).*Y(i:end);
     cov_xy(maxlag+2-i) = nanmean(cov_xy_i);
     cov_std_xy(maxlag+2-i) = nanstd(cov_xy_i);
     n_cov_xy(maxlag+2-i,1) = sum(isfinite(cov_xy_i));
@@ -159,7 +153,6 @@ for i=2:(1 + maxlag) % lag = -(i-1)*dt
 end
 % NOTE: "cov_std_xy" and "n_cov_xy" are unused, and are
 % retained here for troubleshooting and possible inclusion later.
-
 
 % "cov_xy" is also what one would use to calculate the
 % spectrum with the FFT, but seeing as I already have a function
@@ -177,7 +170,7 @@ else
 end
 
 cov_xy = Window_.*cov_xy;
-lags = (-maxlag):(maxlag);
+lags = [(-maxlag):(maxlag)]';
 
 if nargout == 0
     ans = cov_xy
