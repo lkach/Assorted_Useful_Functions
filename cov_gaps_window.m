@@ -1,8 +1,4 @@
-% cov_gaps_window
-% 
-% Not to be confused with MATLAB's default "nancov", which does basically
-% the same thing. This (cov_gaps_window) exists because I know exactly what went
-% into it.
+% COV_GAPS_WINDOW
 % 
 % Possible inputs:
 % 
