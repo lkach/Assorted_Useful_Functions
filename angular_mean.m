@@ -26,16 +26,15 @@ end
 
 dI = max(I) - min(I);
 D_ = D - min(I);
-D_ = D*(2*pi/dI);
+D_ = D_*(2*pi/dI) - pi;
 D_ = exp(1i*D_);
 
 M = nanmean(D_);
-M = angle(M);
+M = angle(M) + pi;
 M = M*(dI/(2*pi));
 M = M + min(I);
 
 if nargout == 2
-    % lkaddpath
     % warning('Requires custom function "interval_wrap".')
     C = interval_wrap(D - M,[min(I) max(I)] - mean(I));
     if transposeC
@@ -43,6 +42,8 @@ if nargout == 2
     else
     end
     varargout{1} = C;
+    % % Plot for troubleshooting:
+    % figure;histogram(D,'BinWidth',[max(I)-min(I)]/100);hold on;histogram(C,'BinWidth',[max(I)-min(I)]/100);title(num2str( M ))
 elseif nargout > 2
     error('Too many outputs.')
 else
