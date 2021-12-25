@@ -1,4 +1,4 @@
-% Given the angular mean of a vector of values, all of which must be in the
+% Gives the angular mean of a vector of values, all of which must be in the
 % interval of interest.
 % 
 % IN:   D = data, vector; all elements in D must lie in I
