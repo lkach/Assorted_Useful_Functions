@@ -128,6 +128,7 @@ Y(~isfinite(Y)) = nan;
 N_x = length(X);
 X = X - nanmean(X);
 Y = Y - nanmean(Y);
+    Y = conj(Y); % for when the inputs are complex
 
 cov_xy = zeros(1 + 2*maxlag,1); % the autocovariance
 cov_std_xy = zeros(1 + 2*maxlag,1); % the std of the points that went into each element in pre-shaped "autocov_x" (starting with zero-lag)
