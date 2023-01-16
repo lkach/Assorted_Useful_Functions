@@ -182,19 +182,22 @@ end
 
 % close all
 % TIME = [0:0.1:9.9]'; DATA = 0.2*randn(100,1) + 7*sin(2*pi*0.44*TIME);
-% [X,J,Y_fit,ConvergenceRecord] = nonlinear_lsqf(DATA,TIME,{'a*sin(2*pi*f*t)','a','f'},[6,0.40],{'sin(2*pi*f*t)','2*pi*t*a.*cos(2*pi*f*t)'},0.001,   100,[]); disp(X)
+% [X,J,Y_fit,ConvergenceRecord,~,X_record] = nonlinear_lsqf(DATA,TIME,{'a*sin(2*pi*f*t)','a','f'},[6,0.40],{'sin(2*pi*f*t)','2*pi*t*a.*cos(2*pi*f*t)'},0.001,   100,[]); disp(X)
+% figure; plot(X_record(1,:),X_record(2,:),'.-'); hold on; plot(X_record(1,end),X_record(2,end),'r*')
 % 
 % %%
 % close all
 % TIME = [0:0.1:9.9]'; DATA = 0.2*randn(100,1) + exp(-[(TIME - 5)/(3)].^2);
-% [X,J,Y_fit,ConvergenceRecord] = nonlinear_lsqf(DATA,TIME,{'exp(-[(t - b)/(a)].^2)','a','b'},[2.5,4.5],...
+% [X,J,Y_fit,ConvergenceRecord,~,X_record] = nonlinear_lsqf(DATA,TIME,{'exp(-[(t - b)/(a)].^2)','a','b'},[2.5,4.5],...
 %     {'(2*(b - t).^2.*exp(-(b - t).^2 /a^2))/a^3','(2*(t - b).*exp(-(b - t).^2 /a^2))/a^2'},...
 %     0.001,   100,[]); disp(X)
+% figure; plot(X_record(1,:),X_record(2,:),'.-'); hold on; plot(X_record(1,end),X_record(2,end),'r*')
 % 
 % %%
 % close all
 % TIME = [0:0.1:9.9]'; DATA = 0.2*randn(100,1) + exp([(TIME - 5)/(3)].^2);
-% [X,J,Y_fit,ConvergenceRecord] = nonlinear_lsqf(DATA,TIME,{'exp([(t - b)/(a)].^2)','a','b'},[2.5,4.5],...[3,5]
+% [X,J,Y_fit,ConvergenceRecord,~,X_record] = nonlinear_lsqf(DATA,TIME,{'exp([(t - b)/(a)].^2)','a','b'},[2.5,4.5],...[3,5]
 %     {'-(2*[(b - t).^2].*exp([(b - t)/a].^2))/[a^3]','((2*b - 2*t).*exp([(b - t).^2]/[a^2]))/[a^2]'},...
 %     0.001,   100,[]); disp(X)
+% figure; plot(X_record(1,:),X_record(2,:),'.-'); hold on; plot(X_record(1,end),X_record(2,end),'r*')
 % %%
