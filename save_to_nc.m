@@ -58,26 +58,6 @@ for ii = 1:NUM_PRIOR_DIMS
     [PRIOR_DIM_NAMES{ii},PRIOR_DIM_SIZE{ii}] = netcdf.inqDim(NCID,PRIOR_DIM_IDS(ii));
 end
 
-% % Get names of existing variables:
-% EXVARIDS = netcdf.inqVarIDs(NCID); EXVARNAMES = cell(size(EXVARIDS));
-% for ii = 1:length(EXVARIDS)
-%     EXVARNAMES{ii} = netcdf.inqVar(NCID,EXVARIDS(ii));
-% end
-% % Identify the index of the variable to delete
-% for ii = 1:length(EXVARIDS)
-%     if strcmp(NAME,EXVARNAMES{ii})
-%         DELVARIND = EXVARIDS(ii);
-%     else
-%     end
-% end
-% % Delete the existing variable
-% if ~isempty(DELVARIND)
-%     netcdf.reDef(NCID);
-%     cdflib.deleteVar(NCID, DELVARIND);
-%     netcdf.endDef(NCID);
-% else
-% end
-
 % Define DIMIDS
 IS_EXISTING_DIM = zeros(size(PRIOR_DIM_NAMES));
 for jj = 1:length(PRIOR_DIM_NAMES)
