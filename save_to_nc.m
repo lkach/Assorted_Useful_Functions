@@ -54,7 +54,6 @@ for ii = 1:length(METADATA)
 end
 
 % Assign values to the new variable if desired
-whos NCID VARID DATA %$
 netcdf.putVar(NCID, VARID, DATA);
 
 % Close the netCDF file
