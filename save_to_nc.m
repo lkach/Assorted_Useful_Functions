@@ -13,11 +13,18 @@
 %          can only write vectors here)
 %   METADATA = arbitrarily long cell comprised of length-2 cells of
 %          attribute-value pairs, e.g. {'Units','m/s'}
+% 
+% OPTIONAL INPUTS:
 %   OVERWRITE = (default "false") prints the system command needed to
 %          delete the variable in question if it already exists. MATLAB has
 %          the native "system" function but that does not seem to work with
 %          commands that are installed by the user, only native system
 %          commands. This variable may be either "true" or "false" (or 1 or 0).
+%   SKIP = (default "false") if NAME is already a variable in FILE, then
+%          this option, if set to "true", skips the execution of the rest
+%          of this script. Leaving this option "false" will lead to an
+%          error if the variable already exists. If the variable does not
+%          exist, then "save_to_nc" will save it regardless of "SKIP".
 % 
 % 
 % Examples of the more complicated inputs:
@@ -31,10 +38,15 @@ function save_to_nc(FILE,NAME,DATA,DIM_METADATA,METADATA,varargin)
 
 if nargin == 5
     OVERWRITE = false;
+    SKIP = false;
 elseif nargin == 6
     OVERWRITE = varargin{1};
+    SKIP = false;
+elseif nargin == 7
+    OVERWRITE = varargin{1};
+    SKIP = varargin{2};
 else
-    error(['The function save_to_nc takes 5 or 6 input arguments, while here ' num2str(nargin) ' were given.'])
+    error(['The function save_to_nc takes 5, 6, or 7 input arguments, while here ' num2str(nargin) ' were given.'])
 end
 
 if OVERWRITE
@@ -57,6 +69,26 @@ PRIOR_DIM_SIZE  = cell(NUM_PRIOR_DIMS,1);
 for ii = 1:NUM_PRIOR_DIMS
     [PRIOR_DIM_NAMES{ii},PRIOR_DIM_SIZE{ii}] = netcdf.inqDim(NCID,PRIOR_DIM_IDS(ii));
 end
+
+% Get names of existing variables:
+EXVARIDS = netcdf.inqVarIDs(NCID); EXVARNAMES = cell(size(EXVARIDS));
+for ii = 1:length(EXVARIDS)
+    EXVARNAMES{ii} = netcdf.inqVar(NCID,EXVARIDS(ii));
+end
+% Identify the index of the variable with the same name as NAME
+DELVARIND = [];
+for ii = 1:length(EXVARIDS)
+    if strcmp(NAME,EXVARNAMES{ii})
+        DELVARIND = [DELVARIND ; EXVARIDS(ii)];
+    else
+    end
+end
+
+if ~isempty(DELVARIND) && SKIP
+warning(['The variable "' NAME '" already exists and was requested to be skipped and not saved over.'])
+else
+
+
 
 % Define DIMIDS
 IS_EXISTING_DIM = zeros(size(PRIOR_DIM_NAMES));
@@ -84,6 +116,7 @@ netcdf.putVar(NCID, VARID, DATA);
 % Close the netCDF file
 netcdf.close(NCID);
 
+end
 end
 
 % save_to_nc('/full/path/test.nc',...
