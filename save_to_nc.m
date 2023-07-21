@@ -9,8 +9,9 @@
 %   DIM_METADATA = an annoying variable structured as a cell with one or
 %          two elements. If one, the element is the name of a known
 %          pre-existing dimension in the file. If two, the first is the new
-%          dimension's name, the second is its size (scalar, it seems we
-%          can only write vectors here)
+%          dimension's name, the second is its size. NOTE: see the optional
+%          variable "MULTIPLE_DIMS" for allowing multiple dimensions for
+%          the same variable.
 %   METADATA = arbitrarily long cell comprised of length-2 cells of
 %          attribute-value pairs, e.g. {'Units','m/s'}
 % 
@@ -25,6 +26,12 @@
 %          of this script. Leaving this option "false" will lead to an
 %          error if the variable already exists. If the variable does not
 %          exist, then "save_to_nc" will save it regardless of "SKIP".
+%   MULTIPLE_DIMS = (default "false") if true, this allows multiple inputs
+%          for the "DIM_METADATA" input, and is necessary for variables
+%          with multiple dimensions. In this case, "DIM_METADATA" is
+%          structured as a cell of cells, where each cell is either
+%          one-element long with a string naming a pre-existing variable,
+%          or it is a string-number pair for a new dimension and its size.
 % 
 % 
 % Examples of the more complicated inputs:
@@ -39,12 +46,20 @@ function save_to_nc(FILE,NAME,DATA,DIM_METADATA,METADATA,varargin)
 if nargin == 5
     OVERWRITE = false;
     SKIP = false;
+    MULTIPLE_DIMS = false;
 elseif nargin == 6
     OVERWRITE = varargin{1};
     SKIP = false;
+    MULTIPLE_DIMS = false;
 elseif nargin == 7
     OVERWRITE = varargin{1};
     SKIP = varargin{2};
+    MULTIPLE_DIMS = false;
+elseif nargin == 8
+    OVERWRITE = varargin{1};
+    SKIP = varargin{2};
+    MULTIPLE_DIMS = varargin{3};
+
 else
     error(['The function save_to_nc takes 5, 6, or 7 input arguments, while here ' num2str(nargin) ' were given.'])
 end
@@ -91,15 +106,31 @@ else
 
 
 % Define DIMIDS
-IS_EXISTING_DIM = zeros(size(PRIOR_DIM_NAMES));
-for jj = 1:length(PRIOR_DIM_NAMES)
-    IS_EXISTING_DIM(jj) = strcmp(PRIOR_DIM_NAMES{jj}, DIM_METADATA{1});
-end
-IS_EXISTING_DIM = sum(IS_EXISTING_DIM);
-if IS_EXISTING_DIM
-    DIMIDS = netcdf.inqDimID(NCID,DIM_METADATA{1}); % pre-existing dimension
+if MULTIPLE_DIMS
+    DIMIDS = nan(length(DIM_METADATA),1);
+    for ii = 1:length(DIM_METADATA)
+        IS_EXISTING_DIM = zeros(size(PRIOR_DIM_NAMES));
+        for jj = 1:length(PRIOR_DIM_NAMES)
+            IS_EXISTING_DIM(jj) = strcmp(PRIOR_DIM_NAMES{jj}, DIM_METADATA{ii}{1});
+        end
+        IS_EXISTING_DIM = sum(IS_EXISTING_DIM);
+        if IS_EXISTING_DIM
+            DIMIDS(ii) = netcdf.inqDimID(NCID,DIM_METADATA{ii}{1}); % pre-existing dimension
+        else
+            DIMIDS(ii) = netcdf.defDim(NCID,DIM_METADATA{ii}{1},DIM_METADATA{ii}{2}); % add a new dimension
+        end
+    end
 else
-    DIMIDS = netcdf.defDim(NCID,DIM_METADATA{1},DIM_METADATA{2}); % add a new dimension
+    IS_EXISTING_DIM = zeros(size(PRIOR_DIM_NAMES));
+    for jj = 1:length(PRIOR_DIM_NAMES)
+        IS_EXISTING_DIM(jj) = strcmp(PRIOR_DIM_NAMES{jj}, DIM_METADATA{1});
+    end
+    IS_EXISTING_DIM = sum(IS_EXISTING_DIM);
+    if IS_EXISTING_DIM
+        DIMIDS = netcdf.inqDimID(NCID,DIM_METADATA{1}); % pre-existing dimension
+    else
+        DIMIDS = netcdf.defDim(NCID,DIM_METADATA{1},DIM_METADATA{2}); % add a new dimension
+    end
 end
 
 % Create the new variable
