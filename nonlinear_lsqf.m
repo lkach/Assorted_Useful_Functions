@@ -172,7 +172,7 @@ if nargin > 7
     else
         set(gca,'YLim',[0 1])
     end
-    xlabel('Iteration'); ylabel('[X_n+1 - X_n]./[X_n]')
+    xlabel('Iteration'); ylabel('[X_n_+_1 - X_n]./[X_n]')
 else
 end
 
