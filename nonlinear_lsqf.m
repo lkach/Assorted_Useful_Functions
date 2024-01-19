@@ -52,6 +52,7 @@ if isrow(PARAMETERS_0); PARAMETERS_0 = PARAMETERS_0'; else; end
 if length(Y)==length(t); else; error('Dependent and independent variable vectors must be the same length.'); end
 t_nans = t; Y_nans = Y;
 t = t(isfinite(Y)); Y = Y(isfinite(Y));
+t = t(isfinite(t)); Y = Y(isfinite(t));
 if length(BASIS)==(length(PARAMETERS_0)+1); else; error('Incorrect number of parameter initial guesses given.'); end
 if nargin > 6
     MaxIt = varargin{1};
